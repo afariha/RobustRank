@@ -56,7 +56,7 @@ Import this GitHub repository in Vercel (**Add New → Project → Import**). Us
 `data/*.json` are compact extracts built from the raw downloads:
 
 ```bash
-python prep/build_data.py "<folder with CSrankings/, BRFSS/, CDC_Obesity/, UN_LifeExpectancy/, Eurostat/>"
+python prep/build_data.py   # raw downloads in ../data/ (CSrankings/, BRFSS/, CDC_Obesity/, UN_LifeExpectancy/, Eurostat/)
 ```
 
 After rebuilding, bump `DATA_VERSION` in `js/app.js`, so browsers fetch the new files instead of cached copies.

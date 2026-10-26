@@ -1,9 +1,9 @@
 """Build the compact JSON datasets used by the RobustRank web app.
 
 Usage:
-    python prep/build_data.py <raw-data-folder>
+    python prep/build_data.py [raw-data-folder] [dataset ...]
 <raw-data-folder> holds CSrankings/, BRFSS/, CDC_Obesity/, UN_LifeExpectancy/ and Eurostat/
-(default: the folder that contains this repository). Output goes to data/ in this repository.
+(default: the data/ folder next to this repository). Output goes to data/ in this repository.
 Eurostat data is downloaded from the public Eurostat API (no key needed).
 """
 import json, re, os, sys, urllib.request
@@ -11,7 +11,7 @@ import numpy as np
 import pandas as pd
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-ROOT = sys.argv[1] if len(sys.argv) > 1 else os.path.dirname(REPO)
+ROOT = sys.argv[1] if len(sys.argv) > 1 and sys.argv[1] else os.path.join(os.path.dirname(REPO), 'data')
 OUT = os.path.join(REPO, 'data')
 os.makedirs(OUT, exist_ok=True)
 
