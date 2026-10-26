@@ -294,35 +294,21 @@
     });
   }
 
-  function ctxName(ds, P, ctx) {
-    const axes = ds.axes(P);
-    return [ctx.year].concat(ctx.v.map((v, i) => v === -1 ? `${axes[i].name}: All` : axes[i].values[v])).join(', ');
-  }
+  // tooltip: the context's actual (untiered) ranking; lines mark the tier boundaries, arrows the entities outside their tier
   function showTip(e, k) {
-    const { ds, P, ctxs, rk, res } = last;
-    const s = res.status[k], moved = res.moved[k];
+    const { ds, P, rk, res } = last;
     const name = (i) => esc(ds.shortName(P, rk.kept[i]));
-    const tierOf = new Map(); res.tiers.forEach((t, i) => t.forEach(x => tierOf.set(x, i)));
-    let body;
-    if (s === 'G') body = 'Holds: every entity ranks inside its tier.';
-    else if (s === 'Y') body = 'Holds with crossings: ' + moved.map(([x, d]) => `${d < 0 ? '↑' : '↓'} ${name(x)}`).join(', ');
-    else {
-      const list = moved.slice(0, 10).map(([x, d]) => `${name(x)} (Tier ${tierOf.get(x) + 1} → ${tierOf.get(x) + 1 + d})`);
-      body = `Breaks: ${moved.length} ${moved.length === 1 ? 'entity ranks' : 'entities rank'} outside ${moved.length === 1 ? 'its' : 'their'} tier: ${list.join(', ')}${moved.length > 10 ? ', …' : ''}`;
-    }
-    // the context's actual (untiered) ranking: lines mark the tier boundaries, arrows the entities outside their tier
     const order = rk.orders[k], shown = order.slice(0, 80), cols = Math.min(4, Math.ceil(shown.length / 20));
     const starts = new Set(); let pos = 0; res.tiers.forEach(t => { if (pos) starts.add(pos); pos += t.length; });
-    const off = new Map(moved);
+    const off = new Map(res.moved[k]);
     const items = shown.map((x, p) => {
       const d = off.get(x), arrow = d ? `<b class="${d < 0 ? 'tu' : 'td'}">${d < 0 ? '↑' : '↓'}</b>` : '';
       return `<li${starts.has(p) ? ' class="tb"' : ''}><span class="rk">${p + 1}</span>${arrow}${name(x)}</li>`;
     }).join('');
     const more = order.length > shown.length ? `<div class="more">… ${order.length - shown.length} more</div>` : '';
     const tip = $('tip');
-    tip.style.maxWidth = Math.max(320, cols * 150) + 'px';
-    tip.innerHTML = `<div class="t">${esc(ctxName(ds, P, ctxs[k]))}</div>${body}` +
-      `<div class="rkhead">Ranking in this context</div><ol style="columns:${cols}">${items}</ol>${more}`;
+    tip.style.maxWidth = Math.max(160, cols * 150) + 'px';
+    tip.innerHTML = `<ol style="columns:${cols}">${items}</ol>${more}`;
     tip.hidden = false; moveTip(e);
   }
   function moveTip(e) {
