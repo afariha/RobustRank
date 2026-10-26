@@ -235,7 +235,7 @@
     worker.onmessage = (ev) => {
       if (id !== runId) return;
       busy = false;
-      $('run').disabled = false; $('run').textContent = 'Find robust tiers';
+      $('run').disabled = false; $('run').textContent = 'Rank robustly';
       last = { ...snapshot, res: ev.data };
       $('panelE').classList.remove('stale'); $('panelF').classList.remove('stale');
       renderResult(); renderGrid();
