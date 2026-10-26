@@ -56,7 +56,7 @@
     id: 'csrankings', name: 'CSRankings', file: 'data/csrankings.json',
     attributes: ['Year', 'Window', 'Venue tier', 'Area'],
     // top-k by adjusted publications 2011-2024, among US departments or worldwide
-    entitySets: [20, 40, 60, 80, 100].map(k => ({ id: `us-${k}`, label: `top ${k} US CS departments` }))
+    entitySets: [60, 100, 200].map(k => ({ id: `us-${k}`, label: `top ${k} US CS departments` }))
       .concat([20, 40, 60, 80, 100].map(k => ({ id: `world-${k}`, label: `top ${k} CS departments worldwide` }))),
     defaultEntitySet: 'us-60',
     functions: [
@@ -78,6 +78,11 @@
       for (const [e, a, t, y, ad, r, n] of raw.cells) { const k = idx(e, a, t) + 1 + y - Y0; adj[k] += ad; cnt[k] += r; rowsA[k] += n; }
       for (const arr of [adj, cnt, rowsA]) for (let k = 0; k < E * A * 2; k++) for (let y = 1; y <= NY; y++) arr[k * stride + y] += arr[k * stride + y - 1];
       return { ...raw, Y0, NY, A, adj, cnt, rowsA, idx, stride };
+    },
+    // label shown in panel A; says "all n" when the data has fewer departments than requested
+    setLabel(P, set) {
+      const n = this.entities(P, set.id).length, [scope, k] = set.id.split('-');
+      return n < +k ? `all ${n} ${scope === 'us' ? 'US CS departments' : 'CS departments worldwide'}` : set.label;
     },
     entities(P, set) {
       const [scope, k] = String(set).split('-');

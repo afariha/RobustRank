@@ -50,7 +50,7 @@
   function renderData() {
     const [y0, y1] = ds.yearRange(P);
     const ents = ds.entitySets.length > 1
-      ? `<select id="entitySet">${ds.entitySets.map(s => `<option value="${s.id}"${s.id === spec.entitySet ? ' selected' : ''}>${esc(s.label)}</option>`).join('')}</select>`
+      ? `<select id="entitySet">${ds.entitySets.map(s => `<option value="${s.id}"${s.id === spec.entitySet ? ' selected' : ''}>${esc(ds.setLabel ? ds.setLabel(P, s) : s.label)}</option>`).join('')}</select>`
       : esc(ds.entitySets[0].label);
     $('dataProps').innerHTML = `<dt>Entities</dt><dd>${ents}</dd><dt>Year range</dt><dd>${y0} to ${y1}</dd>` +
       `<dt>Attributes</dt><dd>${ds.attributes.join(', ')}</dd><dt>#rows</dt><dd>${fmt(P.totalRows)}</dd>`;
@@ -256,6 +256,10 @@
       html += '</div>';
     });
     $('result').innerHTML = html + '</div>';
+    // more than 22 lines of chips: show the first 22 and scroll the rest
+    const box = $('result').querySelector('.tiers');
+    const lines = [...new Set([...box.querySelectorAll('.chip')].map(c => c.offsetTop))].sort((a, b) => a - b);
+    if (lines.length > 22) { box.style.maxHeight = (lines[22] - box.offsetTop - 2) + 'px'; box.classList.add('scroll'); }
   }
 
   // ---------------------------------------------------------------- panel F: where this ranking holds

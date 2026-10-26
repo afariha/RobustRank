@@ -44,8 +44,8 @@ def csrankings():
     d['tier'] = np.where(d.area.isin(next_tier), 1, 0)
     rank = d[d.year.between(2011, 2024)].groupby('dept').adjustedcount.sum().reindex(sorted(d.dept.unique()), fill_value=0)
     order = list(rank.sort_values(ascending=False, kind='stable').index)   # by adjusted pubs 2011-2024 (top-N basis)
-    # keep the top 100 US departments and the top 100 worldwide, in worldwide order
-    top_us = set([x for x in order if country.get(x) == 'us'][:100])
+    # keep the top 200 US departments and the top 100 worldwide, in worldwide order
+    top_us = set([x for x in order if country.get(x) == 'us'][:200])
     ents = [x for i, x in enumerate(order) if i < 100 or x in top_us]
     d = d[d.dept.isin(ents)]
     ei = {e: i for i, e in enumerate(ents)}
