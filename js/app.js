@@ -7,6 +7,7 @@
   const share = (a, b) => { const p = 100 * a / b; return p >= 1 || p === 0 ? Math.round(p) : p >= 0.1 ? p.toFixed(1) : '<0.1'; };
   const esc = (s) => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
+  const DATA_VERSION = '2026-10-26';   // bump when data/*.json changes
   const loaded = new Map();   // dataset id -> prepared data
   let ds = null, P = null, spec = null, last = null, runId = 0;
   let worker = new Worker('js/search.worker.js'), busy = false, autoTimer = null;
@@ -31,9 +32,16 @@
     $('dataset').value = id;
     $('result').innerHTML = '<div class="empty busy">Loading data…</div>';
     $('grid').innerHTML = '';
-    if (!loaded.has(id)) {
-      const raw = await (await fetch(ds.file)).json();
-      loaded.set(id, ds.prepare(raw));
+    try {
+      if (!loaded.has(id)) {
+        // the version query makes browsers fetch data files again after they change
+        const res = await fetch(`${ds.file}?v=${DATA_VERSION}`, { cache: 'no-cache' });
+        if (!res.ok) throw new Error(`${ds.file}: HTTP ${res.status}`);
+        loaded.set(id, ds.prepare(await res.json()));
+      }
+    } catch (err) {
+      if (ds.id === id) $('result').innerHTML = `<div class="empty">Could not load the data (${esc(err.message)}). Reload the page to try again.</div>`;
+      return;
     }
     if (ds.id !== id) return;   // another dataset was picked meanwhile
     P = loaded.get(id);

@@ -58,3 +58,5 @@ Import this GitHub repository in Vercel (**Add New → Project → Import**). Us
 ```bash
 python prep/build_data.py "<folder with CSrankings/, BRFSS/, CDC_Obesity/, UN_LifeExpectancy/, Eurostat/>"
 ```
+
+After rebuilding, bump `DATA_VERSION` in `js/app.js`, so browsers fetch the new files instead of cached copies.
