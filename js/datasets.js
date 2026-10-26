@@ -52,6 +52,7 @@
   const shortUni = (s) => CSR_SHORT[s] || s.replace(/^University of /, '').replace(/^Univ\. of /, '').replace(/ University$/, '')
     .replace(/Institute of Technology/, 'Tech').replace(/Inst\. of Technology/, 'Tech');
 
+  const CSR_WINDOWS = [3, 5, 8, 10];   // publication window lengths in years
   const csrankings = {
     id: 'csrankings', name: 'CSRankings', file: 'data/csrankings.json',
     attributes: ['Year', 'Window', 'Venue tier', 'Area'],
@@ -94,15 +95,15 @@
     yearRange(P) { return [P.years[0], P.years[P.years.length - 1]]; },
     axes(P) {
       return [
-        { id: 'window', name: 'Window', values: [1, 2, 3, 5, 8, 10].map(w => w === 1 ? '1 year' : `${w} years`), short: [1, 2, 3, 5, 8, 10].map(w => `${w} yr`), all: false, raw: [1, 2, 3, 5, 8, 10] },
+        { id: 'window', name: 'Window', values: CSR_WINDOWS.map(w => `${w} years`), short: CSR_WINDOWS.map(w => `${w} yr`), all: false, raw: CSR_WINDOWS },
         { id: 'venue', name: 'Venue tier', values: ['Top-tier only', 'Next-tier only', 'Top + next tier'], short: ['Top', 'Next', 'Top+next'], all: false },
         { id: 'area', name: 'Area', values: P.areaTitles, short: P.areaTitles, all: true },
       ];
     },
     gridOrder: ['venue', 'window', 'area'],
-    defaults: { years: [2021, 2025], fn: 'csr', sel: { window: [4, 5], venue: [0, 2], area: [] }, tolerance: { minRobustness: 0.85 } },
+    defaults: { years: [2021, 2025], fn: 'csr', sel: { window: [2, 3], venue: [0, 2], area: [] }, tolerance: { minRobustness: 0.85 } },
     score(P, fn, e, ctx) {
-      const [wi, vi, ai] = ctx.v, w = [1, 2, 3, 5, 8, 10][wi];
+      const [wi, vi, ai] = ctx.v, w = CSR_WINDOWS[wi];
       const lo = Math.max(ctx.year - w + 1, P.Y0) - P.Y0, hi = ctx.year - P.Y0 + 1;
       const tiers = vi === 0 ? [0] : vi === 1 ? [1] : [0, 1];
       const areas = ai === -1 ? range(0, P.A - 1) : [ai];
@@ -116,7 +117,7 @@
       return fn === 'total' ? total : Math.exp(logSum / areas.length);
     },
     support(P, set, spec) {
-      const ws = spec.sel.window.map(i => [1, 2, 3, 5, 8, 10][i]);
+      const ws = spec.sel.window.map(i => CSR_WINDOWS[i]);
       const lo = Math.max(spec.years[0] - Math.max(...ws) + 1, P.Y0) - P.Y0, hi = spec.years[1] - P.Y0 + 1;
       const tiers = new Set(); for (const v of spec.sel.venue) (v === 0 ? [0] : v === 1 ? [1] : [0, 1]).forEach(t => tiers.add(t));
       const areas = !spec.sel.area.length || spec.sel.area.includes(-1) ? range(0, P.A - 1) : spec.sel.area;
@@ -124,7 +125,7 @@
       for (const e of this.entities(P, set)) for (const a of areas) for (const t of tiers) { const k = P.idx(e, a, t); n += P.rowsA[k + hi] - P.rowsA[k + lo]; }
       return Math.round(n);
     },
-    possibleContexts(P) { return P.years.length * 6 * (P.areas.length + 1) * 3; },
+    possibleContexts(P) { return P.years.length * CSR_WINDOWS.length * (P.areas.length + 1) * 3; },
   };
 
   // ------------------------------------------------------------------ shared: health scores
