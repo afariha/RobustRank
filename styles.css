@@ -15,7 +15,9 @@
 * { box-sizing: border-box; }
 html, body { margin: 0; background: #f6f7f9; color: var(--ink); font-family: Lato, "Helvetica Neue", Arial, sans-serif; font-size: 14px; }
 .app { max-width: 1440px; margin: 16px auto; padding: 14px 16px 16px; background: var(--bg); border: 1px solid var(--line); border-radius: 4px; }
-.brand { margin: 0 0 10px 2px; font-size: 26px; font-weight: 900; letter-spacing: -0.2px; }
+.top { display: grid; grid-template-columns: 350px minmax(0, 1fr); gap: 14px; align-items: center; margin-bottom: 12px; }
+.brand { margin: 0 0 0 2px; font-size: 26px; font-weight: 900; letter-spacing: -0.2px; }
+.about { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.45; }
 .brand span { color: var(--accent); }
 
 .layout { display: grid; grid-template-columns: 350px minmax(0, 1fr); gap: 14px; align-items: start; }
@@ -153,6 +155,7 @@ input[type=range]::-moz-range-thumb { width: 14px; height: 14px; border-radius: 
 .tip .more { color: rgba(255,255,255,.6); margin-top: 3px; }
 
 @media (max-width: 1100px) {
+  .top { grid-template-columns: 1fr; gap: 6px; }
   .layout { grid-template-columns: 1fr; }
   .bottom { grid-template-columns: 1fr; }
   .dbody { grid-template-columns: 1fr; }
