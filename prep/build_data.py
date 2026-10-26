@@ -3,7 +3,7 @@
 Usage:
     python prep/build_data.py [raw-data-folder] [dataset ...]
 <raw-data-folder> holds CSrankings/, BRFSS/, CDC_Obesity/, UN_LifeExpectancy/ and Eurostat/
-(default: the data/ folder next to this repository). Output goes to data/ in this repository.
+(default: data/raw/ in this repository, which git ignores). Output goes to data/ in this repository.
 Eurostat data is downloaded from the public Eurostat API (no key needed).
 """
 import json, re, os, sys, urllib.request
@@ -11,7 +11,7 @@ import numpy as np
 import pandas as pd
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-ROOT = sys.argv[1] if len(sys.argv) > 1 and sys.argv[1] else os.path.join(os.path.dirname(REPO), 'data')
+ROOT = sys.argv[1] if len(sys.argv) > 1 and sys.argv[1] else os.path.join(REPO, 'data', 'raw')
 OUT = os.path.join(REPO, 'data')
 os.makedirs(OUT, exist_ok=True)
 
@@ -124,7 +124,7 @@ def unle():
 # ---------------------------------------------------------------- Eurostat unemployment
 def eurostat():
     url = 'https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/une_rt_a?format=JSON&lang=EN&unit=PC_ACT&sinceTimePeriod=2005'
-    cache = os.path.join(ROOT, 'Eurostat', 'une_rt_a.json')   # fetched with: curl -o Eurostat/une_rt_a.json "<url>"
+    cache = os.path.join(ROOT, 'Eurostat', 'une_rt_a.json')   # fetched with: curl -o data/raw/Eurostat/une_rt_a.json "<url>"
     if os.path.exists(cache):
         d = json.load(open(cache))
     else:
