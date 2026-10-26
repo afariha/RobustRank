@@ -38,7 +38,7 @@
     if (ds.id !== id) return;   // another dataset was picked meanwhile
     P = loaded.get(id);
     const fn = ds.functions.find(f => f.id === ds.defaults.fn);
-    const tol = Object.assign({ minRobustness: 0.5, borderline: 0.25, crossing: 0.25 }, ds.defaults.tolerance);
+    const tol = Object.assign({ minRobustness: 0.5, borderline: 0.25, crossing: 0.25, tau: 10 }, ds.defaults.tolerance);
     spec = {
       entitySet: ds.defaultEntitySet, fn: fn.id, dir: fn.dir, years: ds.defaults.years.slice(),
       sel: Object.assign({}, JSON.parse(JSON.stringify(ds.defaults.sel)), ds.defaultSel ? ds.defaultSel(P) : {}), ...tol,
@@ -76,17 +76,22 @@
   });
   $('dir').addEventListener('change', () => { spec.dir = $('dir').value; changed(); });
 
-  // ---------------------------------------------------------------- panel C: tolerance parameters
+  // ---------------------------------------------------------------- panel C: tolerance parameters and penalty-free tier size
   const setFill = (inp) => inp.style.setProperty('--pct', `${(inp.value - inp.min) / (inp.max - inp.min) * 100}%`);
   ['minRobustness', 'borderline', 'crossing'].forEach(id => {
     const inp = $(id), out = inp.parentElement.querySelector('output');
     inp.addEventListener('input', () => { spec[id] = inp.value / 100; out.textContent = inp.value + '%'; setFill(inp); changed(); });
+  });
+  $('tau').addEventListener('input', () => {
+    const inp = $('tau'); spec.tau = +inp.value; inp.parentElement.querySelector('output').textContent = inp.value; setFill(inp); changed();
   });
   function renderTolerance() {
     ['minRobustness', 'borderline', 'crossing'].forEach(id => {
       const inp = $(id); inp.value = Math.round(spec[id] * 100);
       inp.parentElement.querySelector('output').textContent = inp.value + '%'; setFill(inp);
     });
+    const inp = $('tau'); inp.value = spec.tau;
+    inp.parentElement.querySelector('output').textContent = inp.value; setFill(inp);
   }
 
   // ---------------------------------------------------------------- panel D: context specification
@@ -219,21 +224,22 @@
       $('panelE').classList.remove('stale'); $('panelF').classList.remove('stale');
       renderResult(); renderGrid();
     };
-    worker.postMessage({ orders: rk.orders, minRobustness: spec.minRobustness, borderline: spec.borderline, crossing: spec.crossing });
+    worker.postMessage({ orders: rk.orders, minRobustness: spec.minRobustness, borderline: spec.borderline, crossing: spec.crossing, tau: spec.tau });
   }
 
   // ---------------------------------------------------------------- panel E: robust ranking
   function renderResult() {
     const { ds, P, rk, res } = last;
     const name = (i) => ds.shortName(P, rk.kept[i]), full = (i) => ds.entityName(P, rk.kept[i]);
-    let html = `<div class="summary">Holds in <b>${res.held} of ${res.C}</b> contexts (${pct(res.held, res.C)}%)</div>`;
+    let html = `<div class="summary"><span>Holds in <b>${res.held} of ${res.C}</b> contexts (${pct(res.held, res.C)}%)</span>` +
+      `<span class="order-note">Entities within a tier are ordered alphabetically</span></div>`;
     if (rk.excluded.length) html += `<div class="note">Not ranked (no data in some contexts): ${rk.excluded.map(e => esc(ds.shortName(P, e))).join(', ')}</div>`;
     if (res.held < Math.ceil(last.spec.minRobustness * res.C - 1e-9)) html += `<div class="note">No tiering reaches the minimum robustness except a single tier.</div>`;
     html += '<div class="tiers">';
     res.tiers.forEach((t, i) => {
       const rgb = tierColor(i, res.tiers.length);
       html += `<div class="tl" style="color:${shade(rgb, 0.7)}">Tier ${i + 1}</div><div class="tc">`;
-      for (const e of t) {
+      for (const e of t.slice().sort((a, b) => name(a).localeCompare(name(b), 'en', { sensitivity: 'base' }))) {
         const c = res.crossers[e], cls = c === 'u' ? ' cu' : c === 'd' ? ' cd' : c ? ' cb' : '';
         const arrow = c === 'u' ? '<b class="up">↑</b>' : c === 'd' ? '<b class="down">↓</b>' : c ? '<b class="exc">↕</b>' : '';
         const tip = full(e) + (c === 'u' ? ' (crosses into the tier above)' : c === 'd' ? ' (crosses into the tier below)' : c ? ' (crosses both ways)' : '');

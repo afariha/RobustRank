@@ -48,6 +48,11 @@
           <div class="tol-desc">fraction of contexts an entity may cross a tier boundary</div>
           <div class="tol-row"><input type="range" id="crossing" min="0" max="100" step="5"><output></output></div>
         </div>
+        <div class="tol">
+          <div class="tol-name">Penalty-free tier size</div>
+          <div class="tol-desc">tiers with at most this many entities are not penalized</div>
+          <div class="tol-row"><input type="range" id="tau" min="1" max="30" step="1"><output></output></div>
+        </div>
       </section>
       <button id="run" class="run">Find robust tiers</button>
     </div>
@@ -66,7 +71,7 @@
         <section class="panel" id="panelE">
           <header><h2>Robust ranking</h2><span class="co">E</span></header>
           <div id="result" class="result"></div>
-          <div class="arrows-legend"><span><b class="up">&uarr;</b> crosses into the tier above</span><span><b class="down">&darr;</b> crosses into the tier below</span></div>
+          <div class="arrows-legend"><span><b class="up">&uarr;</b> crosses into the tier above</span><span><b class="down">&darr;</b> crosses into the tier below</span><span><b class="exc">&varr;</b> crosses both ways</span></div>
         </section>
         <section class="panel" id="panelF">
           <header><h2>Where this ranking holds</h2><span class="co">F</span></header>

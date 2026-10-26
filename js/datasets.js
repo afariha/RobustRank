@@ -9,25 +9,25 @@
 
   // ------------------------------------------------------------------ CSRankings
   const CSR_SHORT = {
-    'Carnegie Mellon University': 'CMU', 'Univ. of Illinois at Urbana-Champaign': 'UIUC', 'Georgia Institute of Technology': 'Georgia Tech',
-    'Univ. of California - San Diego': 'UCSD', 'Cornell University': 'Cornell', 'Massachusetts Inst. of Technology': 'MIT',
+    'Carnegie Mellon University': 'Carnegie Mellon', 'Univ. of Illinois at Urbana-Champaign': 'UIUC', 'Georgia Institute of Technology': 'Georgia Tech',
+    'Univ. of California - San Diego': 'UC San Diego', 'Cornell University': 'Cornell', 'Massachusetts Inst. of Technology': 'MIT',
     'Northeastern University': 'Northeastern', 'Stanford University': 'Stanford', 'Univ. of California - Berkeley': 'UC Berkeley',
-    'Univ. of Maryland - College Park': 'UMD', 'University of Michigan': 'Michigan', 'University of Washington': 'UW',
+    'Univ. of Maryland - College Park': 'Maryland', 'University of Michigan': 'Michigan', 'University of Washington': 'U of Washington',
     'New York University': 'NYU', 'Purdue University': 'Purdue', 'Princeton University': 'Princeton',
     'University of Texas at Austin': 'UT Austin', 'University of Wisconsin - Madison': 'Wisconsin', 'Columbia University': 'Columbia',
-    'Univ. of California - Irvine': 'UC Irvine', 'Univ. of California - Los Angeles': 'UCLA', 'Univ. of Massachusetts Amherst': 'UMass',
-    'University of Pennsylvania': 'Penn', 'University of Southern California': 'USC', 'Arizona State University': 'ASU',
-    'Boston University': 'BU', 'Brown University': 'Brown', 'Duke University': 'Duke', 'George Mason University': 'GMU',
-    'Harvard University': 'Harvard', 'Indiana University': 'Indiana', 'Johns Hopkins University': 'JHU',
+    'Univ. of California - Irvine': 'UC Irvine', 'Univ. of California - Los Angeles': 'UCLA', 'Univ. of Massachusetts Amherst': 'UMass Amherst',
+    'University of Pennsylvania': 'Penn', 'University of Southern California': 'USC', 'Arizona State University': 'Arizona State',
+    'Boston University': 'Boston Univ.', 'Brown University': 'Brown', 'Duke University': 'Duke', 'George Mason University': 'George Mason',
+    'Harvard University': 'Harvard', 'Indiana University': 'Indiana', 'Johns Hopkins University': 'Johns Hopkins',
     'North Carolina State University': 'NC State', 'Northwestern University': 'Northwestern', 'Ohio State University': 'Ohio State',
     'Oregon State University': 'Oregon State', 'Pennsylvania State University': 'Penn State', 'Rice University': 'Rice',
     'Rutgers University': 'Rutgers', 'Stony Brook University': 'Stony Brook', 'Texas A&M University': 'Texas A&M',
-    'Univ. of California - Davis': 'UC Davis', 'Univ. of California - Riverside': 'UC Riverside', 'Univ. of California - Santa Barbara': 'UCSB',
-    'Univ. of California - Santa Cruz': 'UCSC', 'University of Central Florida': 'UCF', 'University of Chicago': 'UChicago',
-    'University of Colorado Boulder': 'CU Boulder', 'University of Illinois at Chicago': 'UIC', 'University of Minnesota': 'Minnesota',
-    'University of North Carolina': 'UNC', 'University of Texas at Dallas': 'UT Dallas', 'University of Utah': 'Utah',
-    'University of Virginia': 'UVA', 'Virginia Tech': 'Virginia Tech', 'Yale University': 'Yale', 'University at Buffalo': 'Buffalo',
-    'University of Rochester': 'Rochester', 'University of Notre Dame': 'Notre Dame', 'Washington University in St. Louis': 'WashU',
+    'Univ. of California - Davis': 'UC Davis', 'Univ. of California - Riverside': 'UC Riverside', 'Univ. of California - Santa Barbara': 'UC Santa Barbara',
+    'Univ. of California - Santa Cruz': 'UC Santa Cruz', 'University of Central Florida': 'Central Florida', 'University of Chicago': 'UChicago',
+    'University of Colorado Boulder': 'CU Boulder', 'University of Illinois at Chicago': 'UI Chicago', 'University of Minnesota': 'Minnesota',
+    'University of North Carolina': 'UNC Chapel Hill', 'University of Texas at Dallas': 'UT Dallas', 'University of Utah': 'Utah',
+    'University of Virginia': 'U of Virginia', 'Virginia Tech': 'Virginia Tech', 'Yale University': 'Yale', 'University at Buffalo': 'Buffalo',
+    'University of Rochester': 'Rochester', 'University of Notre Dame': 'Notre Dame', 'Washington University in St. Louis': 'WashU St. Louis',
     'California Inst. of Technology': 'Caltech', 'Univ. of California - Merced': 'UC Merced', 'University of Florida': 'Florida',
     'University of Arizona': 'Arizona', 'University of Pittsburgh': 'Pitt', 'Dartmouth College': 'Dartmouth',
     'Michigan State University': 'Michigan State', 'Iowa State University': 'Iowa State', 'University of Southern Florida': 'USF',
@@ -80,7 +80,7 @@
       ];
     },
     gridOrder: ['venue', 'window', 'area'],
-    defaults: { years: [2022, 2025], fn: 'csr', sel: { window: [2, 3, 4, 5], venue: [0, 2], area: [] } },
+    defaults: { years: [2021, 2025], fn: 'csr', sel: { window: [4, 5], venue: [0, 2], area: [] }, tolerance: { minRobustness: 0.85 } },
     score(P, fn, e, ctx) {
       const [wi, vi, ai] = ctx.v, w = [1, 2, 3, 5, 8, 10][wi];
       const lo = Math.max(ctx.year - w + 1, P.Y0) - P.Y0, hi = ctx.year - P.Y0 + 1;

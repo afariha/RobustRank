@@ -1,18 +1,20 @@
 # RobustRank
 
-RobustRank finds **robust tiered rankings**. The ranking function stays fixed. The app evaluates it on many slices of the data (**contexts**) and searches for the tiered ranking with the most tiers that still holds in enough of those contexts.
+RobustRank finds **robust tiered rankings**. The ranking function stays fixed. The app evaluates it on many slices of the data (**contexts**) and searches for the most informative tiered ranking that still holds in enough of those contexts.
 
 - A **context** is one combination of values chosen on the context axes. The context space is the cross product of the chosen values, for example Year × Window × Venue tier.
 - A tiered ranking **holds** in a context when every entity ranks inside its own tier in that context.
-- **Robustness** is the share of contexts in which the tiered ranking holds. Putting every entity in one tier always holds, so the goal is the largest number of tiers that keeps robustness at or above the minimum.
+- **Robustness** is the share of contexts in which the tiered ranking holds. Putting every entity in one tier always holds, so the goal is the most informative tiering that keeps robustness at or above the minimum.
+- **Informativeness** is the number of tiers minus a penalty for large tiers. A tier with at most τ entities (the penalty-free tier size, 10 by default) costs nothing. A larger tier costs 2^(size − τ) − 1, so the penalty grows exponentially with the tier's size.
 
 ## Tolerance parameters
 
 | Parameter | Meaning |
 |---|---|
 | Minimum robustness | fraction of contexts where the ranking must hold |
-| Borderline entities per tier | fraction of a tier's entities, rounded down, that may cross into the tier directly above or below |
-| Crossing frequency | fraction of contexts, rounded down, in which one such entity may cross |
+| Borderline entities per tier | fraction of a tier's entities, rounded down, that may cross into the tier directly above or below in a context; the crossing entities may differ from context to context |
+| Crossing frequency | fraction of contexts, rounded down, in which one entity may cross |
+| Penalty-free tier size | tiers with at most this many entities are not penalized |
 
 In panel F, each context is shown as:
 - **holds**: green ✓
@@ -33,10 +35,9 @@ Entities are never dropped to improve a result. The only exception is an entity 
 
 ## Search
 
-The search runs in the browser, inside a Web Worker. Two strategies run, and the result with the most tiers wins. Ties go to the result that holds in more contexts.
+The search runs in the browser, inside a Web Worker. It is a greedy tier finder. It orders the entities by a reference order and starts with one tier. In each step, it adds the tier boundary that most raises informativeness, while robustness stays at or above the minimum. Ties go to the boundary that keeps the most contexts holding. Splitting a tier never raises the penalty, so it stops only when no boundary keeps the robustness.
 
-1. **Greedy.** Starting from one tier, repeatedly add the tier boundary that keeps the most contexts holding, while robustness stays at or above the minimum. It runs from three base orders: mean rank, median rank, and the exact search's order.
-2. **Exact strict.** A depth-first search over tier boundaries that groups contexts by their top-j sets. It finds the most tiers with no crossings. It is bounded by time, about 4 s.
+The greedy runs from several reference orders: the median rank, the mean rank, and each context's own ranking. The most informative result wins, with ties going to the result that holds in more contexts. Once 4 s have passed, the remaining reference orders are skipped, so large inputs stay interactive.
 
 ## Run locally
 

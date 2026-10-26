@@ -108,11 +108,12 @@ input[type=range]::-moz-range-thumb { width: 14px; height: 14px; border-radius: 
 
 /* robust ranking */
 .result { position: relative; min-height: 120px; }
-.summary { margin: -2px 0 8px; }
+.summary { margin: -2px 0 8px; display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.summary .order-note { color: var(--muted); font-size: 11.5px; }
 .note { color: var(--muted); font-size: 12px; margin: -4px 0 8px; }
 .tiers { display: grid; grid-template-columns: 62px minmax(0, 1fr); }
 .tiers .tl { font-size: 12.5px; font-weight: 700; padding: 6px 0; border-bottom: 1px solid #e6e7eb; }
-.tiers .tc { display: grid; grid-template-columns: repeat(5, minmax(0, 128px)); gap: 3px 6px; padding: 5px 0; border-bottom: 1px solid #e6e7eb; }
+.tiers .tc { display: grid; grid-template-columns: repeat(4, minmax(0, 150px)); gap: 3px 6px; padding: 5px 0; border-bottom: 1px solid #e6e7eb; }
 .tiers .tl:nth-last-child(2), .tiers .tc:last-child { border-bottom: none; }
 .chip { font-size: 12.5px; font-weight: 700; text-align: center; padding: 1px 4px; border: 1px solid; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .chip.cu { border: 2px solid var(--up); padding: 0 3px; }
