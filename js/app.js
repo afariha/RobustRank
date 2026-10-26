@@ -264,10 +264,6 @@
       html += '</div>';
     });
     $('result').innerHTML = html + '</div>';
-    // more than 22 lines of chips: show the first 22 and scroll the rest
-    const box = $('result').querySelector('.tiers');
-    const lines = [...new Set([...box.querySelectorAll('.chip')].map(c => c.offsetTop))].sort((a, b) => a - b);
-    if (lines.length > 22) { box.style.maxHeight = (lines[22] - box.offsetTop - 2) + 'px'; box.classList.add('scroll'); }
   }
 
   // ---------------------------------------------------------------- panel F: where this ranking holds
