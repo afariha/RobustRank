@@ -126,7 +126,7 @@ input[type=range]::-moz-range-thumb { width: 14px; height: 14px; border-radius: 
 .summary { margin: -2px 0 8px; display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
 .summary .order-note { color: var(--muted); font-size: 11.5px; }
 .note { color: var(--muted); font-size: 12px; margin: -4px 0 8px; }
-.tiers { display: grid; grid-template-columns: 62px minmax(0, 1fr); }
+.tiers { display: grid; grid-template-columns: 62px minmax(0, 1fr); align-content: start; }   /* rows keep their height when there are few tiers */
 .tiers { overflow-y: auto; }
 /* always-visible scrollbars (overlay scrollbars hide until scrolled) */
 .tiers::-webkit-scrollbar, .gridwrap::-webkit-scrollbar { width: 9px; height: 9px; }
@@ -135,7 +135,7 @@ input[type=range]::-moz-range-thumb { width: 14px; height: 14px; border-radius: 
 .tiers::-webkit-scrollbar-thumb:hover, .gridwrap::-webkit-scrollbar-thumb:hover { background: #9a9eab; }
 @supports not selector(::-webkit-scrollbar) { .tiers, .gridwrap { scrollbar-color: #b9bcc6 #f1f2f5; } }
 .tiers .tl { font-size: 12.5px; font-weight: 700; padding: 6px 0; border-bottom: 1px solid #e6e7eb; }
-.tiers .tc { display: grid; grid-template-columns: repeat(4, minmax(0, 150px)); gap: 3px 6px; padding: 5px 0; border-bottom: 1px solid #e6e7eb; }
+.tiers .tc { display: grid; align-content: start; grid-template-columns: repeat(4, minmax(0, 150px)); gap: 3px 6px; padding: 5px 0; border-bottom: 1px solid #e6e7eb; }
 .tiers .tl:nth-last-child(2), .tiers .tc:last-child { border-bottom: none; }
 .chip { font-size: 12.5px; font-weight: 700; text-align: center; padding: 1px 4px; border: 1px solid; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .chip.cu { border: 2px solid var(--up); padding: 0 3px; }
