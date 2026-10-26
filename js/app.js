@@ -9,7 +9,7 @@
 
   const loaded = new Map();   // dataset id -> prepared data
   let ds = null, P = null, spec = null, last = null, runId = 0;
-  const worker = new Worker('js/search.worker.js');
+  let worker = new Worker('js/search.worker.js'), busy = false, autoTimer = null;
 
   // ---------------------------------------------------------------- tier colors (the mockup's blue-to-red scale)
   const TIER_COLORS = ['#2E6FBA', '#3A7FC0', '#3A8FB7', '#3A9F9B', '#3FA36B', '#7AA83E', '#B3A62E', '#E0A526', '#E07B26', '#D8673A', '#C8553D'];
@@ -198,13 +198,19 @@
   }
 
   // ---------------------------------------------------------------- search
+  // every change reruns the search after a short pause, so dragging a slider does not start a search per step
   function changed() {
     renderCtxBox();
     if (last) { $('panelE').classList.add('stale'); $('panelF').classList.add('stale'); }
+    clearTimeout(autoTimer);
+    autoTimer = setTimeout(run, 300);
   }
   $('run').addEventListener('click', run);
 
   function run() {
+    clearTimeout(autoTimer);
+    // a newer search replaces one still running
+    if (busy) { worker.terminate(); worker = new Worker('js/search.worker.js'); busy = false; }
     const ctxs = contexts(ds, P, spec);
     if (!ctxs.length) return;
     const rk = rankings(ds, P, spec, ctxs);
@@ -219,11 +225,13 @@
     const snapshot = { ds, P, spec: JSON.parse(JSON.stringify(spec)), ctxs, rk };
     worker.onmessage = (ev) => {
       if (id !== runId) return;
+      busy = false;
       $('run').disabled = false; $('run').textContent = 'Find robust tiers';
       last = { ...snapshot, res: ev.data };
       $('panelE').classList.remove('stale'); $('panelF').classList.remove('stale');
       renderResult(); renderGrid();
     };
+    busy = true;
     worker.postMessage({ orders: rk.orders, minRobustness: spec.minRobustness, borderline: spec.borderline, crossing: spec.crossing, tau: spec.tau });
   }
 
