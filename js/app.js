@@ -7,7 +7,7 @@
   const share = (a, b) => { const p = 100 * a / b; return p >= 1 || p === 0 ? Math.round(p) : p >= 0.1 ? p.toFixed(1) : '<0.1'; };
   const esc = (s) => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
-  const DATA_VERSION = '2026-10-26';   // bump when data/*.json changes
+  const DATA_VERSION = '2026-10-26b';   // bump when data/*.json changes
   const loaded = new Map();   // dataset id -> prepared data
   let ds = null, P = null, spec = null, last = null, runId = 0;
   let worker = new Worker('js/search.worker.js'), busy = false, autoTimer = null;

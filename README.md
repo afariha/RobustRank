@@ -25,7 +25,7 @@ In panel F, each context is shown as:
 
 | Dataset | Entities | Context axes | Ranking functions |
 |---|---|---|---|
-| CSRankings | top 60, 100 or all 195 US CS departments, or the top 20 to 100 worldwide | Year, Window, Venue tier, Area | CSRankings score (geometric mean over areas of pubs + 1), raw-count variant, total pubs |
+| CSRankings | top 60, 100 or all 195 US CS departments, or the top 60, 80, 100 or 500 worldwide | Year, Window, Venue tier, Area | CSRankings score (geometric mean over areas of pubs + 1), raw-count variant, total pubs |
 | CDC BRFSS survey (respondent microdata, 2011 to 2025) | 51 US states (DC included) | Year, Sex, Age group, Education, Income | Health Risk Score, obesity rate, physical inactivity rate (survey weighted) |
 | CDC obesity estimates (Nutrition, Physical Activity, and Obesity table) | 51 US states | Year, Subgroup | same as BRFSS, from CDC's published state estimates |
 | UN life expectancy (UN WPP via Our World in Data) | G20, OECD or all 237 countries | Year, Sex, Age | remaining life expectancy |

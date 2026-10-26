@@ -57,7 +57,7 @@
     attributes: ['Year', 'Window', 'Venue tier', 'Area'],
     // top-k by adjusted publications 2011-2024, among US departments or worldwide
     entitySets: [60, 100, 200].map(k => ({ id: `us-${k}`, label: `top ${k} US CS departments` }))
-      .concat([20, 40, 60, 80, 100].map(k => ({ id: `world-${k}`, label: `top ${k} CS departments worldwide` }))),
+      .concat([60, 80, 100, 500].map(k => ({ id: `world-${k}`, label: `top ${k} CS departments worldwide` }))),
     defaultEntitySet: 'us-60',
     functions: [
       { id: 'csr', name: 'CSRankings score', dir: 'DESC' },
