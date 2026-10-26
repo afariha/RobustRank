@@ -39,6 +39,15 @@
     'University of Connecticut': 'UConn', 'University of Kentucky': 'Kentucky', 'Rensselaer Polytechnic Institute': 'RPI',
     'Stevens Institute of Technology': 'Stevens', 'Worcester Polytechnic Institute': 'WPI', 'Syracuse University': 'Syracuse',
     'Washington State University': 'Washington State', 'University of Nebraska': 'Nebraska', 'University of Tennessee': 'Tennessee',
+    'Shanghai Jiao Tong University': 'Shanghai Jiao Tong', 'Nanyang Technological University': 'NTU Singapore',
+    'National University of Singapore': 'NUS', 'Chinese University of Hong Kong': 'CUHK', 'Chinese Academy of Sciences': 'CAS',
+    'Seoul National University': 'Seoul National', 'Max Planck Society': 'Max Planck', 'University of Hong Kong': 'HKU',
+    'Harbin Institute of Technology': 'Harbin Tech', 'Renmin University of China': 'Renmin', 'Imperial College London': 'Imperial',
+    'University of British Columbia': 'UBC', 'Singapore Management University': 'SMU Singapore', 'CISPA Helmholtz Center': 'CISPA',
+    'University College London': 'UCL', 'Hebrew University of Jerusalem': 'Hebrew Univ.', 'The Hong Kong Polytechnic Univ.': 'HK PolyU',
+    'Tel Aviv University': 'Tel Aviv', 'Simon Fraser University': 'Simon Fraser', 'Sun Yat-sen University': 'Sun Yat-sen',
+    'University of Toronto': 'Toronto', 'University of Waterloo': 'Waterloo', 'University of Oxford': 'Oxford',
+    'University of Cambridge': 'Cambridge', 'University of Edinburgh': 'Edinburgh', 'University of Tokyo': 'Tokyo',
   };
   const shortUni = (s) => CSR_SHORT[s] || s.replace(/^University of /, '').replace(/^Univ\. of /, '').replace(/ University$/, '')
     .replace(/Institute of Technology/, 'Tech').replace(/Inst\. of Technology/, 'Tech');
@@ -46,8 +55,10 @@
   const csrankings = {
     id: 'csrankings', name: 'CSRankings', file: 'data/csrankings.json',
     attributes: ['Year', 'Window', 'Venue tier', 'Area'],
-    entitySets: [20, 40, 60, 80, 100].map(k => ({ id: k, label: `top ${k} US CS departments` })),
-    defaultEntitySet: 60,
+    // top-k by adjusted publications 2011-2024, among US departments or worldwide
+    entitySets: [20, 40, 60, 80, 100].map(k => ({ id: `us-${k}`, label: `top ${k} US CS departments` }))
+      .concat([20, 40, 60, 80, 100].map(k => ({ id: `world-${k}`, label: `top ${k} CS departments worldwide` }))),
+    defaultEntitySet: 'us-60',
     functions: [
       { id: 'csr', name: 'CSRankings score', dir: 'DESC' },
       { id: 'csrraw', name: 'CSRankings score (raw counts)', dir: 'DESC' },
@@ -68,7 +79,11 @@
       for (const arr of [adj, cnt, rowsA]) for (let k = 0; k < E * A * 2; k++) for (let y = 1; y <= NY; y++) arr[k * stride + y] += arr[k * stride + y - 1];
       return { ...raw, Y0, NY, A, adj, cnt, rowsA, idx, stride };
     },
-    entities(P, set) { return range(0, Math.min(set, P.entities.length) - 1); },
+    entities(P, set) {
+      const [scope, k] = String(set).split('-');
+      const all = range(0, P.entities.length - 1);   // entities are in worldwide order
+      return (scope === 'us' ? all.filter(e => P.countries[e] === 'us') : all).slice(0, +k);
+    },
     entityName(P, e) { return P.entities[e]; },
     shortName(P, e) { return shortUni(P.entities[e]); },
     yearRange(P) { return [P.years[0], P.years[P.years.length - 1]]; },

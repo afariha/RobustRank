@@ -37,18 +37,22 @@ def csrankings():
     raw = pd.read_csv(os.path.join(R, 'generated-author-info.csv'))
     total_rows = int(raw.year.between(2000, 2025).sum())
     inst = pd.read_csv(os.path.join(R, 'institutions.csv'))
-    us = set(inst[inst.countryabbrv == 'us'].institution)
-    d = raw[raw.dept.isin(us) & raw.year.between(2000, 2025)].copy()
+    country = dict(zip(inst.institution, inst.countryabbrv))
+    d = raw[raw.year.between(2000, 2025)].copy()
     d['ar'] = d.area.map(lambda v: parent.get(v, v))
     d = d[d.ar.isin(areas)]
     d['tier'] = np.where(d.area.isin(next_tier), 1, 0)
     rank = d[d.year.between(2011, 2024)].groupby('dept').adjustedcount.sum().reindex(sorted(d.dept.unique()), fill_value=0)
-    ents = list(rank.sort_values(ascending=False, kind='stable').index)   # ordered by adjusted pubs 2011-2024 (top-N basis)
+    order = list(rank.sort_values(ascending=False, kind='stable').index)   # by adjusted pubs 2011-2024 (top-N basis)
+    # keep the top 100 US departments and the top 100 worldwide, in worldwide order
+    top_us = set([x for x in order if country.get(x) == 'us'][:100])
+    ents = [x for i, x in enumerate(order) if i < 100 or x in top_us]
+    d = d[d.dept.isin(ents)]
     ei = {e: i for i, e in enumerate(ents)}
     ai = {a: i for i, a in enumerate(areas)}
     g = d.groupby(['dept', 'ar', 'tier', 'year']).agg(adj=('adjustedcount', 'sum'), raw=('count', 'sum'), rows=('name', 'size')).reset_index()
     cells = [[ei[r.dept], ai[r.ar], int(r.tier), int(r.year), round(float(r.adj), 4), round(float(r.raw), 2), int(r.rows)] for r in g.itertuples()]
-    dump('csrankings.json', {'entities': ents, 'areas': areas, 'areaTitles': [titles.get(a, a) for a in areas],
+    dump('csrankings.json', {'entities': ents, 'countries': [country.get(x, '') for x in ents], 'areas': areas, 'areaTitles': [titles.get(a, a) for a in areas],
                              'years': list(range(2000, 2026)), 'cells': cells, 'totalRows': total_rows,
                              'nextTierVenues': sorted(next_tier)})
 
