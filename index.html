@@ -26,6 +26,7 @@
       <section class="panel" id="panelA">
         <header><h2>Data</h2></header>
         <div class="select"><select id="dataset"></select></div>
+        <div class="ds-about" id="dsAbout"></div>
         <dl class="props" id="dataProps"></dl>
       </section>
 
@@ -87,6 +88,19 @@
       </div>
     </div>
   </div>
+
+  <footer class="foot">
+    <p class="disclaimer"><b>Disclaimer.</b> RobustRank is a research prototype for exploring how much a ranking
+      depends on the choice of data. Its results depend on the data, the ranking function, and the choices you make,
+      and may contain errors. They should not be used as the sole basis for admissions, hiring, funding, or policy
+      decisions, or to claim that one institution, state, or country is better than another.</p>
+    <p class="credit">Built by <a href="https://afariha.github.io/" target="_blank" rel="noopener">Anna Fariha</a>,
+      University of Utah. Data: <a href="https://csrankings.org/" target="_blank" rel="noopener">CSRankings</a> by
+      Emery Berger (publications from DBLP), CDC BRFSS and Nutrition, Physical Activity, and Obesity
+      data, UN World Population Prospects via Our World in Data, and Eurostat.
+      <a href="https://github.com/afariha/RobustRank" target="_blank" rel="noopener">Source code</a>.</p>
+    <p class="copyright">&copy; 2026 Anna Fariha. All rights reserved.</p>
+  </footer>
 </div>
 <div id="tip" class="tip" hidden></div>
 <script src="js/datasets.js"></script>

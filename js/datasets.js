@@ -55,6 +55,7 @@
   const CSR_WINDOWS = [3, 5, 8, 10];   // publication window lengths in years
   const csrankings = {
     id: 'csrankings', name: 'CSRankings', file: 'data/csrankings.json',
+    about: 'Faculty papers at top CS venues, per department and year',
     attributes: ['Year', 'Window', 'Venue tier', 'Area'],
     // top-k by adjusted publications 2011-2024, among US departments or worldwide
     entitySets: [60, 100, 200].map(k => ({ id: `us-${k}`, label: `top ${k} US CS departments` }))
@@ -155,6 +156,7 @@
   const BRFSS_AXES = [['sex', 'Sex'], ['age_group', 'Age group'], ['education', 'Education'], ['income', 'Income']];
   const brfss = {
     id: 'brfss', name: 'CDC BRFSS survey', file: 'data/brfss.json',
+    about: 'CDC health survey of US adults, per state and year',
     attributes: ['Year', 'Sex', 'Age group', 'Education', 'Income'],
     entitySets: [{ id: 'all', label: '51 US states' }], defaultEntitySet: 'all',
     functions: HEALTH_FNS,
@@ -202,6 +204,7 @@
   // ------------------------------------------------------------------ CDC Nutrition, Physical Activity & Obesity (state estimates)
   const npao = {
     id: 'npao', name: 'CDC obesity estimates', file: 'data/npao.json',
+    about: 'CDC obesity and inactivity rates, per state and year',
     attributes: ['Year', 'Subgroup'],
     entitySets: [{ id: 'all', label: '51 US states' }], defaultEntitySet: 'all',
     functions: HEALTH_FNS,
@@ -246,6 +249,7 @@
   const COUNTRY_SHORT = { 'United States': 'USA', 'United Kingdom': 'UK', 'South Korea': 'Korea', 'New Zealand': 'New Zealand', 'Bosnia and Herzegovina': 'Bosnia & Herz.', 'North Macedonia': 'N. Macedonia', 'Saudi Arabia': 'Saudi Arabia', 'South Africa': 'South Africa' };
   const unle = {
     id: 'unle', name: 'UN life expectancy', file: 'data/unle.json',
+    about: 'Remaining life expectancy, per country, year, sex, and age',
     attributes: ['Year', 'Sex', 'Age'],
     entitySets: [{ id: 'oecd', label: '38 OECD countries' }, { id: 'g20', label: '19 G20 countries' }, { id: 'all', label: 'all 237 countries' }],
     defaultEntitySet: 'g20',
@@ -283,6 +287,7 @@
   // ------------------------------------------------------------------ Eurostat unemployment rates
   const eurostat = {
     id: 'eurostat', name: 'Eurostat unemployment', file: 'data/eurostat.json',
+    about: 'Unemployment rates in Europe, per country, year, sex, and age',
     attributes: ['Year', 'Sex', 'Age'],
     entitySets: [{ id: 'eu', label: '27 EU countries' }, { id: 'all', label: '35 European countries' }], defaultEntitySet: 'eu',
     functions: [{ id: 'unemp', name: 'Unemployment rate', dir: 'ASC' }],

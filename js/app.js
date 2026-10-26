@@ -60,6 +60,7 @@
     const ents = ds.entitySets.length > 1
       ? `<select id="entitySet">${ds.entitySets.map(s => `<option value="${s.id}"${s.id === spec.entitySet ? ' selected' : ''}>${esc(ds.setLabel ? ds.setLabel(P, s) : s.label)}</option>`).join('')}</select>`
       : esc(ds.entitySets[0].label);
+    $('dsAbout').textContent = ds.about || '';
     $('dataProps').innerHTML = `<dt>Entities</dt><dd>${ents}</dd><dt>Year range</dt><dd>${y0} to ${y1}</dd>` +
       `<dt>Attributes</dt><dd>${ds.attributes.join(', ')}</dd><dt>#rows</dt><dd>${fmt(P.totalRows)}</dd>`;
     const es = $('entitySet');
