@@ -23,13 +23,13 @@
     <!-- left column: data, ranking function, tolerance parameters -->
     <div class="left">
       <section class="panel" id="panelA">
-        <header><h2>Data</h2><span class="co">A</span></header>
+        <header><h2>Data</h2></header>
         <div class="select"><select id="dataset"></select></div>
         <dl class="props" id="dataProps"></dl>
       </section>
 
       <section class="panel" id="panelB">
-        <header><h2>Ranking function</h2><span class="co">B</span></header>
+        <header><h2>Ranking function</h2></header>
         <div class="fnrow">
           <div class="select grow"><select id="fn"></select></div>
           <div class="select dir"><select id="dir"><option>DESC</option><option>ASC</option></select></div>
@@ -38,7 +38,7 @@
       </section>
 
       <section class="panel" id="panelC">
-        <header><h2>Tolerance parameters</h2><span class="co">C</span></header>
+        <header><h2>Tolerance parameters</h2></header>
         <div class="tol">
           <div class="tol-name">Minimum robustness</div>
           <div class="tol-desc">fraction of contexts where the ranking must hold</div>
@@ -66,7 +66,7 @@
     <!-- right: context specification, robust ranking, where it holds -->
     <div class="right">
       <section class="panel" id="panelD">
-        <header><h2>Context specification</h2><span class="co">D</span></header>
+        <header><h2>Context specification</h2></header>
         <div class="dbody">
           <div class="axes" id="axes"></div>
           <div class="infobox ctxbox" id="ctxbox"></div>
@@ -75,12 +75,12 @@
 
       <div class="bottom">
         <section class="panel" id="panelE">
-          <header><h2>Robust ranking</h2><span class="co">E</span></header>
+          <header><h2>Robust ranking</h2></header>
           <div id="result" class="result"></div>
           <div class="arrows-legend"><span><b class="up">&uarr;</b> crosses into the tier above</span><span><b class="down">&darr;</b> crosses into the tier below</span><span><b class="exc">&varr;</b> crosses both ways</span></div>
         </section>
         <section class="panel" id="panelF">
-          <header><h2>Where this ranking holds</h2><span class="co">F</span></header>
+          <header><h2>Where this ranking holds</h2></header>
           <div id="grid" class="gridwrap"></div>
         </section>
       </div>
