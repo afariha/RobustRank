@@ -310,13 +310,28 @@
       const list = moved.slice(0, 10).map(([x, d]) => `${name(x)} (Tier ${tierOf.get(x) + 1} → ${tierOf.get(x) + 1 + d})`);
       body = `Breaks: ${moved.length} ${moved.length === 1 ? 'entity ranks' : 'entities rank'} outside ${moved.length === 1 ? 'its' : 'their'} tier: ${list.join(', ')}${moved.length > 10 ? ', …' : ''}`;
     }
-    $('tip').innerHTML = `<div class="t">${esc(ctxName(ds, P, ctxs[k]))}</div>${body}`;
-    $('tip').hidden = false; moveTip(e);
+    // the context's actual (untiered) ranking: lines mark the tier boundaries, arrows the entities outside their tier
+    const order = rk.orders[k], shown = order.slice(0, 80), cols = Math.min(4, Math.ceil(shown.length / 20));
+    const starts = new Set(); let pos = 0; res.tiers.forEach(t => { if (pos) starts.add(pos); pos += t.length; });
+    const off = new Map(moved);
+    const items = shown.map((x, p) => {
+      const d = off.get(x), arrow = d ? `<b class="${d < 0 ? 'tu' : 'td'}">${d < 0 ? '↑' : '↓'}</b>` : '';
+      return `<li${starts.has(p) ? ' class="tb"' : ''}><span class="rk">${p + 1}</span>${arrow}${name(x)}</li>`;
+    }).join('');
+    const more = order.length > shown.length ? `<div class="more">… ${order.length - shown.length} more</div>` : '';
+    const tip = $('tip');
+    tip.style.maxWidth = Math.max(320, cols * 150) + 'px';
+    tip.innerHTML = `<div class="t">${esc(ctxName(ds, P, ctxs[k]))}</div>${body}` +
+      `<div class="rkhead">Ranking in this context</div><ol style="columns:${cols}">${items}</ol>${more}`;
+    tip.hidden = false; moveTip(e);
   }
   function moveTip(e) {
-    const t = $('tip'), w = t.offsetWidth;
-    t.style.left = Math.min(e.clientX + 14, window.innerWidth - w - 8) + 'px';
-    t.style.top = (e.clientY + 16) + 'px';
+    const t = $('tip'), w = t.offsetWidth, h = t.offsetHeight;
+    // keep the tooltip on screen: flip to the left of / above the cursor when needed
+    const x = e.clientX + 14 + w > window.innerWidth - 8 ? e.clientX - 14 - w : e.clientX + 14;
+    const y = e.clientY + 16 + h > window.innerHeight - 8 ? Math.max(8, window.innerHeight - h - 8) : e.clientY + 16;
+    t.style.left = Math.max(8, x) + 'px';
+    t.style.top = y + 'px';
   }
 
   function renderAll() { renderData(); renderFunction(); renderTolerance(); renderAxes(); }
