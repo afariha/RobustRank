@@ -197,7 +197,7 @@
     let html = `<div class="lab">Contexts</div><div class="big">${fmt(n)}</div><div class="sub">${parts.join(' × ')}</div>`;
     if (n) {
       const rows = ds.support(P, spec.entitySet, spec);
-      html += `<div class="lab">Support</div><div>${fmt(n)} of ${fmt(ds.possibleContexts(P))} possible contexts</div><div>${fmt(rows)} rows (${share(rows, P.totalRows)}%)</div>`;
+      html += `<div class="lab">Support</div><div>${fmt(n)} of ${fmt(ds.possibleContexts(P))} possible contexts (${share(n, ds.possibleContexts(P))}%)</div><div>${fmt(rows)} rows (${share(rows, P.totalRows)}%)</div>`;
     }
     if (missing.length) html += `<div class="warn">Pick at least one value for ${missing.join(' and ')}.</div>`;
     else if (n > 400) html += `<div class="warn">Many contexts: the search may take a while.</div>`;

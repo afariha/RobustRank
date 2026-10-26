@@ -15,7 +15,20 @@
 * { box-sizing: border-box; }
 html, body { margin: 0; background: #f6f7f9; color: var(--ink); font-family: Lato, "Helvetica Neue", Arial, sans-serif; font-size: 14px; }
 .app { max-width: 1440px; margin: 16px auto; padding: 14px 16px 16px; background: var(--bg); border: 1px solid var(--line); border-radius: 4px; }
-.top { display: grid; grid-template-columns: 350px minmax(0, 1fr); gap: 14px; align-items: center; margin-bottom: 12px; }
+.top { display: grid; grid-template-columns: 350px minmax(0, 1fr) auto; gap: 14px; align-items: center; margin-bottom: 12px; }
+.guide-btn { font: 700 13px Lato, sans-serif; color: var(--accent); background: #fff; border: 1px solid var(--accent); border-radius: 3px; padding: 6px 14px; cursor: pointer; }
+.guide-btn:hover { background: #fff1f1; }
+/* guide mode */
+.guide-spot { position: fixed; z-index: 60; border-radius: 5px; box-shadow: 0 0 0 9999px rgba(20, 22, 30, .55); outline: 2px solid var(--accent); pointer-events: none; transition: all .25s ease; }
+.guide-card { position: fixed; z-index: 61; width: 300px; max-width: calc(100vw - 16px); background: #fff; border-radius: 6px; box-shadow: 0 10px 30px rgba(0,0,0,.25); padding: 14px 16px 12px; transition: left .25s ease, top .25s ease; }
+.guide-count { font-size: 11.5px; color: var(--muted); margin-bottom: 2px; }
+.guide-title { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+.guide-text { font-size: 13px; line-height: 1.5; }
+.guide-buttons { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; gap: 8px; }
+.guide-buttons button { font: 700 13px Lato, sans-serif; border-radius: 3px; padding: 6px 12px; cursor: pointer; }
+.guide-next { background: var(--accent); color: #fff; border: 1px solid var(--accent); margin-left: 6px; }
+.guide-back { background: #fff; color: var(--ink); border: 1px solid var(--line); }
+.guide-skip { background: none; border: none; color: var(--muted); padding-left: 0 !important; font-weight: 400 !important; }
 .brand { margin: 0 0 0 2px; font-size: 26px; font-weight: 900; letter-spacing: -0.2px; }
 .about { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.45; }
 .brand span { color: var(--accent); }
@@ -172,6 +185,7 @@ input[type=range]::-moz-range-thumb { width: 14px; height: 14px; border-radius: 
 @media (max-width: 1100px) {
   .tiers { max-height: 70vh; padding-right: 6px; }
   .top { grid-template-columns: 1fr; gap: 6px; }
+  .guide-btn { justify-self: start; }
   .layout { grid-template-columns: 1fr; }
   .bottom { grid-template-columns: 1fr; }
   .dbody { grid-template-columns: 1fr; }
