@@ -11,6 +11,8 @@
   const loaded = new Map();   // dataset id -> prepared data
   let ds = null, P = null, spec = null, last = null, runId = 0;
   let worker = new Worker('js/search.worker.js'), busy = false, autoTimer = null;
+  // dirty: inputs changed since the last run; pinned: tolerance changes re-evaluate the shown tiers instead of searching
+  let dirty = true, pinned = false, nContexts = 0;
 
   // ---------------------------------------------------------------- tier colors (the mockup's blue-to-red scale)
   const TIER_COLORS = ['#2E6FBA', '#3A7FC0', '#3A8FB7', '#3A9F9B', '#3FA36B', '#7AA83E', '#B3A62E', '#E0A526', '#E07B26', '#D8673A', '#C8553D'];
@@ -44,6 +46,7 @@
       return;
     }
     if (ds.id !== id) return;   // another dataset was picked meanwhile
+    setPinned(false);
     P = loaded.get(id);
     const fn = ds.functions.find(f => f.id === ds.defaults.fn);
     const tol = Object.assign({ minRobustness: 0.5, borderline: 0.25, crossing: 0.25, tau: 10 }, ds.defaults.tolerance);
@@ -89,10 +92,10 @@
   const setFill = (inp) => inp.style.setProperty('--pct', `${(inp.value - inp.min) / (inp.max - inp.min) * 100}%`);
   ['minRobustness', 'borderline', 'crossing'].forEach(id => {
     const inp = $(id), out = inp.parentElement.querySelector('output');
-    inp.addEventListener('input', () => { spec[id] = inp.value / 100; out.textContent = inp.value + '%'; setFill(inp); changed(); });
+    inp.addEventListener('input', () => { spec[id] = inp.value / 100; out.textContent = inp.value + '%'; setFill(inp); changed(true); });
   });
   $('tau').addEventListener('input', () => {
-    const inp = $('tau'); spec.tau = +inp.value; inp.parentElement.querySelector('output').textContent = inp.value; setFill(inp); changed();
+    const inp = $('tau'); spec.tau = +inp.value; inp.parentElement.querySelector('output').textContent = inp.value; setFill(inp); changed(true);
   });
   function renderTolerance() {
     ['minRobustness', 'borderline', 'crossing'].forEach(id => {
@@ -203,45 +206,80 @@
     if (missing.length) html += `<div class="warn">Pick at least one value for ${missing.join(' and ')}.</div>`;
     else if (n > 400) html += `<div class="warn">Many contexts: the search may take a while.</div>`;
     $('ctxbox').innerHTML = html;
-    $('run').disabled = !n;
+    nContexts = n; updateRun();
   }
 
   // ---------------------------------------------------------------- search
-  // every change reruns the search after a short pause, so dragging a slider does not start a search per step
-  function changed() {
+  // every change reruns the search after a short pause, so dragging a slider does not start a search per step;
+  // with a pinned ranking, tolerance changes wait for "Rank robustly" and other changes unpin it
+  function changed(tolerance) {
+    if (pinned && !tolerance) setPinned(false);
+    dirty = true;
     renderCtxBox();
-    if (last) { $('panelE').classList.add('stale'); $('panelF').classList.add('stale'); }
+    if (last) { $('panelF').classList.add('stale'); if (!pinned) $('panelE').classList.add('stale'); }
     clearTimeout(autoTimer);
-    autoTimer = setTimeout(run, 300);
+    if (!pinned) autoTimer = setTimeout(run, 300);
+  }
+  // nothing to gain from a run when the shown result already reflects the inputs;
+  // only a result that reflects the inputs can be pinned
+  function updateRun() {
+    $('run').disabled = busy || !nContexts || !dirty;
+    $('pin').disabled = !last || (!pinned && (busy || dirty));
   }
   $('run').addEventListener('click', run);
+
+  function setPinned(on) {
+    pinned = on;
+    $('pin').setAttribute('aria-pressed', on);
+    $('pin').textContent = on ? 'Pinned' : 'Pin ranking';
+    updateRun();
+  }
+  $('pin').addEventListener('click', () => {
+    setPinned(!pinned);
+    if (!pinned && dirty) run();   // unpinning: search again if the tolerances moved meanwhile
+    else if (last) renderResult();
+  });
 
   function run() {
     clearTimeout(autoTimer);
     // a newer search replaces one still running
     if (busy) { worker.terminate(); worker = new Worker('js/search.worker.js'); busy = false; }
+    if (pinned && last) return evaluatePinned();
     const ctxs = contexts(ds, P, spec);
     if (!ctxs.length) return;
     const rk = rankings(ds, P, spec, ctxs);
     const id = ++runId;
+    dirty = false;
     if (rk.kept.length < 2) {
-      last = null;
+      last = null; setPinned(false); updateRun();
       $('result').innerHTML = `<div class="empty">Fewer than two entities have data in every context.</div>`;
       $('grid').innerHTML = '';
       return;
     }
-    $('run').disabled = true; $('run').textContent = 'Searching…';
     const snapshot = { ds, P, spec: JSON.parse(JSON.stringify(spec)), ctxs, rk };
+    post(id, 'Searching…', { orders: rk.orders, minRobustness: spec.minRobustness, borderline: spec.borderline, crossing: spec.crossing, tau: spec.tau },
+      (res) => { last = { ...snapshot, res }; setPinned(false); });
+  }
+
+  // pinned: keep the shown tiers and contexts, and recompute only where they hold under the current tolerances
+  function evaluatePinned() {
+    const id = ++runId;
+    dirty = false;
+    const snapshot = { ...last, spec: JSON.parse(JSON.stringify(spec)) };
+    post(id, 'Evaluating…', { orders: last.rk.orders, tiers: last.res.tiers, borderline: spec.borderline, crossing: spec.crossing },
+      (res) => { last = { ...snapshot, res }; });
+  }
+
+  function post(id, label, msg, done) {
+    busy = true; updateRun(); $('run').textContent = label;
     worker.onmessage = (ev) => {
       if (id !== runId) return;
-      busy = false;
-      $('run').disabled = false; $('run').textContent = 'Rank robustly';
-      last = { ...snapshot, res: ev.data };
+      busy = false; $('run').textContent = 'Rank robustly'; updateRun();
+      done(ev.data);
       $('panelE').classList.remove('stale'); $('panelF').classList.remove('stale');
       renderResult(); renderGrid();
     };
-    busy = true;
-    worker.postMessage({ orders: rk.orders, minRobustness: spec.minRobustness, borderline: spec.borderline, crossing: spec.crossing, tau: spec.tau });
+    worker.postMessage(msg);
   }
 
   // ---------------------------------------------------------------- panel E: robust ranking
@@ -251,7 +289,7 @@
     let html = `<div class="summary"><span>Holds in <b>${res.held} of ${res.C}</b> contexts (${pct(res.held, res.C)}%)</span>` +
       `<span class="order-note">Entities within a tier are ordered alphabetically</span></div>`;
     if (rk.excluded.length) html += `<div class="note">Not ranked (no data in some contexts): ${rk.excluded.map(e => esc(ds.shortName(P, e))).join(', ')}</div>`;
-    if (res.held < Math.ceil(last.spec.minRobustness * res.C - 1e-9)) html += `<div class="note">No tiering reaches the minimum robustness except a single tier.</div>`;
+    if (!pinned && res.held < Math.ceil(last.spec.minRobustness * res.C - 1e-9)) html += `<div class="note">No tiering reaches the minimum robustness except a single tier.</div>`;
     html += '<div class="tiers">';
     res.tiers.forEach((t, i) => {
       const rgb = tierColor(i, res.tiers.length);

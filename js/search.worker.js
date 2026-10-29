@@ -98,7 +98,12 @@ function search({ orders, minRobustness, borderline, crossing, tau = Infinity })
     const cand = { seq, I: informativeness(r.b, tau), r, method: 'greedy from ' + name };
     if (better(cand, best)) best = cand;
   }
-  const seq = best.seq, r = best.r, pick = best.method;
+  return { ...describe(orders, best.seq, best.r), informativeness: best.I, method: best.method, capped };
+}
+
+// tiers, crossers, and per-context moves of tier boundaries r.b over the entity sequence seq
+function describe(orders, seq, r) {
+  const C = orders.length, n = seq.length;
   const tiers = [];
   for (let t = 0; t + 1 < r.b.length; t++) tiers.push(seq.slice(r.b[t], r.b[t + 1]));
   const crossers = {};
@@ -108,8 +113,15 @@ function search({ orders, minRobustness, borderline, crossing, tau = Infinity })
   tiers.forEach((t, i) => t.forEach(e => { tierOf[e] = i; }));
   for (let t = 0; t + 1 < r.b.length; t++) for (let p = r.b[t]; p < r.b[t + 1]; p++) bandOf[p] = t;
   const moved = orders.map(ord => { const m = []; ord.forEach((e, p) => { if (bandOf[p] !== tierOf[e]) m.push([e, bandOf[p] - tierOf[e]]); }); return m; });
-  return { tiers, status: r.status, crossers, moved, held: r.held, strict: r.strict, informativeness: best.I, method: pick, capped, C, n };
+  return { tiers, status: r.status, crossers, moved, held: r.held, strict: r.strict, C, n };
 }
 
-if (typeof module !== 'undefined') module.exports = { search, evaluate, greedySearch, informativeness };
-else self.onmessage = (ev) => self.postMessage(search(ev.data));
+// a pinned tiering: no search, only where the given tiers hold under the given tolerances
+function evaluateFixed({ orders, tiers, borderline, crossing }) {
+  const seq = tiers.flat(), cuts = [];
+  let p = 0; tiers.slice(0, -1).forEach(t => cuts.push(p += t.length));
+  return describe(orders, seq, evaluate(orders, seq, cuts, borderline, crossing));
+}
+
+if (typeof module !== 'undefined') module.exports = { search, evaluate, evaluateFixed, greedySearch, informativeness };
+else self.onmessage = (ev) => self.postMessage(ev.data.tiers ? evaluateFixed(ev.data) : search(ev.data));

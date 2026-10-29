@@ -85,6 +85,9 @@ input[type=range]::-moz-range-thumb { width: 14px; height: 14px; border-radius: 
 .run { width: 100%; border: none; border-radius: 3px; background: var(--accent); color: #fff; font: 700 15px Lato, sans-serif; padding: 10px; cursor: pointer; }
 .run:hover { background: #f03a3a; }
 .run:disabled { background: #f5a3a3; cursor: default; }
+.pin { font: 700 12px Lato, sans-serif; color: var(--accent); background: #fff; border: 1px solid var(--accent); border-radius: 3px; padding: 3px 10px; cursor: pointer; }
+.pin[aria-pressed=true] { color: #fff; background: var(--accent); }
+.pin:disabled { color: #f5a3a3; border-color: #f5a3a3; background: #fff; cursor: default; }
 
 /* context specification */
 .dbody { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 18px; align-items: start; }
