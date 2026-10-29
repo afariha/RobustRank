@@ -76,6 +76,9 @@ html, body { margin: 0; background: #f6f7f9; color: var(--ink); font-family: Lat
 .tol-row input { flex: 1; }
 .tol-row output { width: 42px; text-align: right; color: var(--accent); font-weight: 700; font-size: 14.5px; }
 
+.tol.off { opacity: .4; }
+.tol.off input[type=range]::-webkit-slider-thumb { cursor: default; }
+.tol.off input[type=range]::-moz-range-thumb { cursor: default; }
 input[type=range] { -webkit-appearance: none; appearance: none; height: 16px; background: transparent; margin: 0; --pct: 50%; }
 input[type=range]::-webkit-slider-runnable-track { height: 4px; border-radius: 2px; background: linear-gradient(to right, var(--accent) var(--pct), var(--line) var(--pct)); }
 input[type=range]::-moz-range-track { height: 4px; border-radius: 2px; background: linear-gradient(to right, var(--accent) var(--pct), var(--line) var(--pct)); }

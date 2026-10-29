@@ -233,6 +233,8 @@
     $('pin').setAttribute('aria-pressed', on);
     $('pin').title = on ? 'Pinned: tolerance changes keep these tiers. Click to unpin.' : 'Pin this ranking to keep it fixed while you tune the tolerance parameters';
     $('pin').setAttribute('aria-label', on ? 'Unpin ranking' : 'Pin ranking');
+    // minimum robustness and penalty-free tier size only steer the search, so they do nothing for pinned tiers
+    ['minRobustness', 'tau'].forEach(id => { $(id).disabled = on; $(id).closest('.tol').classList.toggle('off', on); });
     updateRun();
   }
   $('pin').addEventListener('click', () => {
