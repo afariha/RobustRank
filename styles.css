@@ -85,8 +85,10 @@ input[type=range]::-moz-range-thumb { width: 14px; height: 14px; border-radius: 
 .run { width: 100%; border: none; border-radius: 3px; background: var(--accent); color: #fff; font: 700 15px Lato, sans-serif; padding: 10px; cursor: pointer; }
 .run:hover { background: #f03a3a; }
 .run:disabled { background: #f5a3a3; cursor: default; }
-.pin { font: 700 12px Lato, sans-serif; color: var(--accent); background: #fff; border: 1px solid var(--accent); border-radius: 3px; padding: 3px 10px; cursor: pointer; }
+.pin { display: flex; align-items: center; justify-content: center; width: 28px; height: 26px; padding: 0; color: var(--accent); background: #fff; border: 1px solid var(--accent); border-radius: 3px; cursor: pointer; }
+.pin svg { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round; transform: rotate(45deg); transition: transform .15s; }
 .pin[aria-pressed=true] { color: #fff; background: var(--accent); }
+.pin[aria-pressed=true] svg { fill: currentColor; transform: none; }
 .pin:disabled { color: #f5a3a3; border-color: #f5a3a3; background: #fff; cursor: default; }
 
 /* context specification */

@@ -231,7 +231,8 @@
   function setPinned(on) {
     pinned = on;
     $('pin').setAttribute('aria-pressed', on);
-    $('pin').textContent = on ? 'Pinned' : 'Pin ranking';
+    $('pin').title = on ? 'Pinned: tolerance changes keep these tiers. Click to unpin.' : 'Pin this ranking to keep it fixed while you tune the tolerance parameters';
+    $('pin').setAttribute('aria-label', on ? 'Unpin ranking' : 'Pin ranking');
     updateRun();
   }
   $('pin').addEventListener('click', () => {
