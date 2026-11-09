@@ -9,15 +9,16 @@
 // Entities that cross in some holding context are "borderline" and get arrows in the UI.
 // Robustness = held contexts / all contexts.
 // Informativeness = #tiers - sum of tier penalties, where a tier with at most tau entities costs nothing and a
-// larger tier costs 2^(size - tau) - 1. Goal: the most informative tiering with robustness >= minRobustness.
+// larger tier costs (size - tau)^2. Goal: the tiering with the most tiers and robustness >= minRobustness,
+// ties broken by the highest informativeness.
 // Splitting a tier never raises the penalty, so every boundary that keeps the robustness raises informativeness.
 // Tier finder (greedy): order the entities by a reference order and start with a single tier. In each step, add the
 // tier boundary that most raises informativeness (ties: keeps the most contexts holding, then the most holding
 // strictly) while robustness stays >= minimum; stop when every boundary would drop robustness below the minimum.
 // The greedy runs from several reference orders (median rank, mean rank, and each context's own ranking) and the
-// most informative result wins (ties: more held, then more strictly held).
+// result with the most tiers wins (ties: more informative, then more held, then more strictly held).
 
-const penalty = (size, tau) => size > tau ? 2 ** (size - tau) - 1 : 0;
+const penalty = (size, tau) => size > tau ? (size - tau) ** 2 : 0;
 function informativeness(b, tau) {
   let I = b.length - 1;
   for (let t = 0; t + 1 < b.length; t++) I -= penalty(b[t + 1] - b[t], tau);
@@ -87,7 +88,9 @@ function search({ orders, minRobustness, borderline, crossing, tau = Infinity })
   const starts = [['median rank', [...Array(n).keys()].sort((a, b) => med[a] - med[b] || mean[a] - mean[b] || a - b)],
                   ['mean rank', [...Array(n).keys()].sort((a, b) => mean[a] - mean[b] || a - b)]]
     .concat(orders.map((o, c) => [`ranking in context ${c + 1}`, o]));
-  const better = (a, b) => !b || a.I > b.I || (a.I === b.I && (a.r.held > b.r.held || (a.r.held === b.r.held && a.r.strict > b.r.strict)));
+  const tiers = (x) => x.r.b.length - 1;
+  const better = (a, b) => !b || tiers(a) > tiers(b) || (tiers(a) === tiers(b) && (a.I > b.I || (a.I === b.I &&
+    (a.r.held > b.r.held || (a.r.held === b.r.held && a.r.strict > b.r.strict)))));
   // the median-rank start always runs; further starts run while the time budget lasts (keeps large inputs interactive)
   const t0 = Date.now(), timeCap = 4000;
   let best = null, capped = false;
